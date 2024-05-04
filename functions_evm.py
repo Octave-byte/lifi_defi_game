@@ -6,8 +6,7 @@ import json
 from datetime import datetime, timedelta
 
 
-
-address_list = pd.read_csv('registry_address_lifi.csv')    
+#address_list = pd.read_csv('registry_address_lifi.csv')    
 
 def get_protocols(address, API_KEY): 
     url = f"https://pro-openapi.debank.com/v1/user/all_simple_protocol_list?id={address}&chain_ids=blast,scrl,era,metis,linea,base,eth,op,arb,xdai,matic,bsc,avax"
@@ -111,6 +110,6 @@ def get_wallet_activity(address, days, API_KEY):
 def get_daily_activity(address_list, days = 1, API_KEY):
   final_df = pd.DataFrame()
   for address in address_list['address']:
-    df = get_wallet_activity('0xb29601eB52a052042FB6c68C69a442BD0AE90082',1)
+    df = get_wallet_activity(address,1, API_KEY)
     final_df = pd.concat(df, final_df)
 return final_df
