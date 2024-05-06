@@ -115,7 +115,7 @@ def get_daily_activity(address_list, API_KEY, days):
 
   for address in address_list:
     print(address)
-    df = get_wallet_activity(address,1, API_KEY)
+    df = get_wallet_activity(address,days, API_KEY)
     final_df = pd.concat([df, final_df])
 
   return final_df
