@@ -6,13 +6,11 @@ import json
 from datetime import datetime, timedelta
 
 
-#address_list = pd.read_csv('registry_address_lifi.csv')    
-
 def get_protocols(address, API_KEY): 
     url = f"https://pro-openapi.debank.com/v1/user/all_simple_protocol_list?id={address}&chain_ids=blast,scrl,era,metis,linea,base,eth,op,arb,xdai,matic,bsc,avax"
     headers = {
     'accept': 'application/json',
-    'AccessKey': APY_KEY  # Replace 'API_KEY' with your actual access key
+    'AccessKey': API_KEY  # Replace 'API_KEY' with your actual access key
     }
     response = requests.get(url, headers=headers)
     data = response.json()
@@ -72,30 +70,37 @@ def get_jumper_activity(address,days):
     
     data = response.json()
     df = pd.DataFrame(data['transfers'])
-    df = pd.json_normalize(df['receiving'])
-
-    # Check if the transfer occurred within the last timestamp
-    filtered_df = df.loc[df['timestamp'] >= time]
-    filtered_df['amountUSD'] = filtered_df['amountUSD'].astype(float)
     
+    if df.empty:
+       df = pd.DataFrame(columns=['address', 'value', 'cat', 'subcat'])
+       return df
+    else:
+       df = pd.json_normalize(df['receiving'])
+        # Check if the transfer occurred within the last timestamp
+       filtered_df = df.loc[df['timestamp'] >= time]
+       filtered_df['amountUSD'] = filtered_df['amountUSD'].astype(float)
+        
+       filtered_df = filtered_df.groupby(['chainId']).sum('amountUSD').reset_index()
+       filtered_df['cat'] = 'jumper_activity'
+       filtered_df = filtered_df.rename(columns={'chainId': 'subcat', 'amountUSD': 'value'})
+       filtered_df['address'] = address
+        
+       filtered_df = filtered_df[['address','value','cat','subcat']]
+        
+       return filtered_df
     
-    filtered_df = filtered_df.groupby(['chainId']).sum('amountUSD').reset_index()
-    filtered_df['cat'] = 'jumper_activity'
-    filtered_df = filtered_df.rename(columns={'chainId': 'subcat', 'amountUSD': 'value'})
-    filtered_df['address'] = address
-    
-    filtered_df = filtered_df[['address','value','cat','subcat']]
-    
-    return filtered_df
-
-
+  
 
 def get_wallet_activity(address, days, API_KEY):
+
     c= get_protocols(address, API_KEY)
     d = get_balance(address, API_KEY)
     f =  get_jumper_activity(address,days)
     
-    df = pd.concat([c, d, f])
+    if f.empty:
+        df = pd.concat([c, d])
+    else:
+        df = pd.concat([c, d, f])
     
     df['date'] = datetime.today().strftime('%Y-%m-%d')
     
@@ -104,9 +109,14 @@ def get_wallet_activity(address, days, API_KEY):
 
 
 
-def get_daily_activity(address_list, days = 1, API_KEY):
+
+def get_daily_activity(address_list, API_KEY, days):
   final_df = pd.DataFrame()
-  for address in address_list['address']:
+
+  for address in addresses:
+    print(address)
     df = get_wallet_activity(address,1, API_KEY)
-    final_df = pd.concat(df, final_df)
-return final_df
+    final_df = pd.concat([df, final_df])
+
+  return final_df
+
