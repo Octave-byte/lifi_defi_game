@@ -35,7 +35,6 @@ def get_protocols(address, API_KEY):
     
     return df
 
-#c= get_protocols('0xb29601eB52a052042FB6c68C69a442BD0AE90082')
 
 
 ## 30 units
@@ -61,7 +60,6 @@ def get_balance(address, API_KEY):
     
     return df
 
-#d = get_balance('0xb29601eB52a052042FB6c68C69a442BD0AE90082')
 
 
 def get_jumper_activity(address,days):
@@ -90,7 +88,7 @@ def get_jumper_activity(address,days):
     
     return filtered_df
 
-#f =  get_jumper_activity('0xb29601eB52a052042FB6c68C69a442BD0AE90082',80)
+
 
 def get_wallet_activity(address, days, API_KEY):
     c= get_protocols(address, API_KEY)
@@ -104,7 +102,6 @@ def get_wallet_activity(address, days, API_KEY):
     return df
 
 
-#final = get_wallet_activity('0xb29601eB52a052042FB6c68C69a442BD0AE90082',2)
 
 
 def get_daily_activity(address_list, days = 1, API_KEY):
