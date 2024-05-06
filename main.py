@@ -5,7 +5,7 @@ import pandas as pd
 # Import list of addresses
 address_list = pd.read_csv('registry_address_lifi.csv')
 address_list = address_list.rename(columns={'EVM Address': 'address'})
-address_list_solana = address_list.rename(columns={'Solana Address': 'sol_address'})
+address_list_solana = address_list.rename(columns={'SOLANA Address': 'sol_address'})
 addresses = address_list['address']
 sol_addresses = address_list['sol_address']
 
